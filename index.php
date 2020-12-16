@@ -12,19 +12,19 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 add_action('init','simply_init');
 function simply_init()
 {
-
     add_filter('woocommerce_checkout_fields', function ($fields) {
         $user = wp_get_current_user();
-        $list = array_merge([null], get_field('addresses', 'user_' . $user->ID));
+        $list = array_merge([null], get_field('field_5fd9d7c5bb008', 'user_' . $user->ID));
         if(empty($list)){
             return $fields;
         }
         $list_of_values = [];
         foreach ($list as $key => $value) {
-            $list_of_values[$value] = $value;
+            $list_of_values[$value->ID] = $value->post_title;
         }
         $fields['billing']['acf_addresses']['label'] = __('Shipping address', 'simplyCT');
         $fields['billing']['acf_addresses']['required'] = true;
+        $fields['billing']['acf_addresses']['class'] = array( 'wps-drop' );
         $fields['billing']['acf_addresses']['type'] = 'select';
         $fields['billing']['acf_addresses']['options'] = $list_of_values;
         return $fields;
@@ -38,7 +38,8 @@ function simply_init()
 function simply_thankyou( $order_id ) {
     $order = wc_get_order( $order_id );
     $meta_key = 'acf_addresses';
-    $address = $order->get_meta( $meta_key,true );
+    $branch_id = $order->get_meta( $meta_key,true );
+    $address = get_the_title($branch_id);
     echo '<h2>'.__('Sonol Address','simply').'</h2>';
     echo '<h5>'.$address.'</h5>';
 }
